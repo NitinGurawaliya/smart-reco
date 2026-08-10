@@ -1,0 +1,114 @@
+[PIPE 03:59:28.351] TRIGGER_CHECK user_id=3 should_run=True reason='threshold_and_cooldown' skip_reason=None new_event_count=3 threshold=3 cooldown_remaining=0.0 last_rec_id=29 last_generated_at='2026-08-09T03:56:28.816707' conf_event_n=3 family_counts={'frontend': 3} family='frontend' confident=True confidence_reason='confident_majority'
+2026-08-09 09:29:28,351 INFO app.trigger: MAYBE_RUN_AGENT fire user=3 reason=threshold_and_cooldown new_events=3 family=frontend ts=2026-08-09T03:59:28.351827+00:00
+2026-08-09 09:29:28,352 INFO smartreco.pipeline: [PIPE 03:59:28.351] TRIGGER_FIRE user_id=3 reason='threshold_and_cooldown' new_events=3 family='frontend'
+[PIPE 03:59:28.351] TRIGGER_FIRE user_id=3 reason='threshold_and_cooldown' new_events=3 family='frontend'
+2026-08-09 09:29:28,352 INFO app.agent.runner: AGENT_START user=3 reason=threshold_and_cooldown ts=2026-08-09T03:59:28.352177+00:00
+2026-08-09 09:29:28,352 INFO smartreco.pipeline: [PIPE 03:59:28.352] AGENT_START user_id=3 trigger_reason='threshold_and_cooldown' ts='2026-08-09T03:59:28.352177+00:00'
+[PIPE 03:59:28.352] AGENT_START user_id=3 trigger_reason='threshold_and_cooldown' ts='2026-08-09T03:59:28.352177+00:00'
+2026-08-09 09:29:28,394 INFO app.agent.runner: AGENT_INVOKE graph user=3 reason=threshold_and_cooldown
+2026-08-09 09:29:28,398 ERROR app.agent.nodes: summarize LLM failed — using deterministic cluster
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\projects\smart-reco\backend\app\agent\nodes.py", line 131, in summarize_activity
+    raw = chat_completion(
+        system=prompts.SUMMARIZE_SYSTEM,
+    ...<15 lines>...
+        max_tokens=550,
+    )
+  File "C:\Users\USER\Desktop\projects\smart-reco\backend\app\mesh.py", line 53, in chat_completion
+    client = get_llm_client()
+  File "C:\Users\USER\Desktop\projects\smart-reco\backend\app\mesh.py", line 28, in get_llm_client
+    raise RuntimeError(
+    ...<2 lines>...
+    )
+RuntimeError: Missing API key for LLM_PROVIDER='groq'. Set MESH_API_KEY (mesh), GROQ_API_KEY (groq), or XAI_API_KEY (grok).
+Batches: 100%|███████████████████████████████████| 1/1 [00:00<00:00, 34.76it/s]
+Batches: 100%|███████████████████████████████████| 1/1 [00:00<00:00, 51.82it/s]
+2026-08-09 09:29:28,465 ERROR app.agent.runner: LangGraph agent failed user_id=3 — pattern fallback
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\projects\smart-reco\backend\app\agent\runner.py", line 284, in run_agent
+    final = graph.invoke(
+        {
+    ...<9 lines>...
+        config=agent_run_config(user_id=user_id, trigger_reason=trigger_reason),    )
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python314\Lib\site-packages\langgraph\pregel\main.py", line 3068, in invoke
+    for chunk in self.stream(
+                 ~~~~~~~~~~~^
+        input,
+        ^^^^^^
+    ...<10 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    ):
+    ^
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python314\Lib\site-packages\langgraph\pregel\main.py", line 2643, in stream
+    for _ in runner.tick(
+             ~~~~~~~~~~~^
+        [t for t in loop.tasks.values() if not t.writes],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        schedule_task=loop.accept_push,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python314\Lib\site-packages\langgraph\pregel\_runner.py", line 167, in tick
+    run_with_retry(
+    ~~~~~~~~~~~~~~^
+        t,
+        ^^
+    ...<10 lines>...
+        },
+        ^^
+    )
+    ^
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python314\Lib\site-packages\langgraph\pregel\_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python314\Lib\site-packages\langgraph\_internal\_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python314\Lib\site-packages\langgraph\_internal\_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+  File "C:\Users\USER\Desktop\projects\smart-reco\backend\app\agent\nodes.py", line 261, in grade_retrieval
+    raw = chat_completion(
+        system=prompts.GRADE_SYSTEM,
+    ...<9 lines>...
+        max_tokens=300,
+    )
+  File "C:\Users\USER\Desktop\projects\smart-reco\backend\app\mesh.py", line 53, in chat_completion
+    client = get_llm_client()
+  File "C:\Users\USER\Desktop\projects\smart-reco\backend\app\mesh.py", line 28, in get_llm_client
+    raise RuntimeError(
+    ...<2 lines>...
+    )
+RuntimeError: Missing API key for LLM_PROVIDER='groq'. Set MESH_API_KEY (mesh), GROQ_API_KEY (groq), or XAI_API_KEY (grok).
+During task with name 'grade_retrieval' and id '7b160941-07fc-2621-6d54-8ae020b983f9'
+2026-08-09 09:29:28,468 INFO smartreco.pipeline: [PIPE 03:59:28.468] AGENT_PATH user_id=3 path='pattern_fallback' why='langgraph_exception'
+[PIPE 03:59:28.468] AGENT_PATH user_id=3 path='pattern_fallback' why='langgraph_exception'
+2026-08-09 09:29:28,468 WARNING app.agent.runner: LangGraph/LLM unavailable — pattern embedding fallback user_id=3
+Batches: 100%|███████████████████████████████████| 1/1 [00:00<00:00, 50.68it/s]
+Batches: 100%|███████████████████████████████████| 1/1 [00:00<00:00, 55.54it/s]
+2026-08-09 09:29:28,530 INFO app.agent.runner: pattern fallback stored id=32 resources=[3] themes=['react', 'typescript'] family=frontend summary=[]
+2026-08-09 09:29:28,530 INFO smartreco.pipeline: [PIPE 03:59:28.530] REC_STORED user_id=3 rec_id=32 generated_at='2026-08-09T03:59:28.523503' trigger_reason='threshold_and_cooldown+pattern_fallback' resource_ids=[3]
+[PIPE 03:59:28.530] REC_STORED user_id=3 rec_id=32 generated_at='2026-08-09T03:59:28.523503' trigger_reason='threshold_and_cooldown+pattern_fallback' resource_ids=[3]
+2026-08-09 09:29:28,532 INFO app.routers.events: EVENTS_POST_RESULT user=3 inserted=1 triggered=True reason=threshold_and_cooldown rec_id=32 ts=2026-08-09T03:59:28.532391+00:00
+2026-08-09 09:29:28,532 INFO smartreco.pipeline: [PIPE 03:59:28.532] EVENTS_RESPONSE user_id=3 inserted=1 triggered=True trigger_reason='threshold_and_cooldown' rec_id=32 rec_generated_at='2026-08-09T03:59:28.523503'
+[PIPE 03:59:28.532] EVENTS_RESPONSE user_id=3 inserted=1 triggered=True trigger_reason='threshold_and_cooldown' rec_id=32 rec_generated_at='2026-08-09T03:59:28.523503'
+INFO:     127.0.0.1:60110 - "POST /events HTTP/1.1" 200 OK
+2026-08-09 09:29:28,535 DEBUG app.database: DB_SESSION closed
+2026-08-09 09:29:28,536 INFO smartreco.pipeline: [PIPE 03:59:28.536] HTTP_REQUEST method='GET' path='/recommendations/status' body=None
+[PIPE 03:59:28.536] HTTP_REQUEST method='GET' path='/recommendations/status' body=None
+2026-08-09 09:29:28,537 DEBUG app.database: DB_SESSION open
+2026-08-09 09:29:28,540 DEBUG app.routers.recommendations: RECOMMENDATION_STATUS user=3
+2026-08-09 09:29:28,540 INFO app.trigger: EVALUATE_TRIGGER start user=3 ts=2026-08-09T03:59:28.540205+00:00
+INFO:     127.0.0.1:60110 - "GET /recommendations/status HTTP/1.1" 200 OK
+2026-08-09 09:29:28,545 DEBUG app.database: DB_SESSION closed
+2026-08-09 09:29:32,035 INFO smartreco.pipeline: [PIPE 03:59:32.035] HTTP_REQUEST method='GET' path='/recommendations/status' body=None
+[PIPE 03:59:32.035] HTTP_REQUEST method='GET' path='/recommendations/status' body=None
+2026-08-09 09:29:32,036 DEBUG app.database: DB_SESSION open
+2026-08-09 09:29:32,038 DEBUG app.routers.recommendations: RECOMMENDATION_STATUS user=5
+2026-08-09 09:29:32,038 INFO app.trigger: EVALUATE_TRIGGER start user=5 ts=2026-08-09T03:59:32.038545+00:00
+INFO:     127.0.0.1:60159 - "GET /recommendations/status HTTP/1.1" 200 OK
+2026-08-09 09:29:32,042 DEBUG app.database: DB_SESSION closed
+
+-- truncated --
+
+(Full terminal capture is available in the IDE's terminal buffer; this file contains the portion captured by the automation.)
