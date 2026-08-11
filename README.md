@@ -29,9 +29,9 @@ guardrail for query scoping — it still does not pick from a hardcoded playlist
 
 ### LLM provider swap (Mesh mandatory for submission)
 
-`LLM_PROVIDER=mesh|groq|grok` plus the matching API key / model in `.env` is a
+`LLM_PROVIDER=mesh` plus the matching API key / model in `.env` is a
 **config-only** change. Agent nodes call `chat_completion()` in `app/mesh.py`
-(OpenAI-compatible adapter). No Grok/Groq-specific logic lives in LangGraph nodes.
+(OpenAI-compatible adapter). 
 
 ## Architecture
 
@@ -88,9 +88,6 @@ npm run dev
 ### LLM provider
 
 - **Submission (required):** `LLM_PROVIDER=mesh` + valid `MESH_API_KEY` (+ `MESH_MODEL` if needed)
-- **Local/dev:** `LLM_PROVIDER=groq` or `LLM_PROVIDER=grok` with the matching key  
-Switching providers is **config-only** — see Architecture Honesty above.  
-If the LLM is rate-limited, the runner uses a Chroma + guardrail fallback (still not 1:1 view→video).
 
 ## Agent trigger rules
 

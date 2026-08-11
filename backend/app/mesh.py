@@ -1,4 +1,4 @@
-"""OpenAI-compatible LLM provider adapter (Mesh | Groq | Grok/xAI).
+""").
 
 Agent nodes must call ``chat_completion`` / ``parse_json_object`` only.
 Provider-specific keys, base URLs, model names, and 429 retries live HERE —
@@ -22,12 +22,12 @@ logger = logging.getLogger(__name__)
 
 
 def get_llm_client() -> OpenAI:
-    """Build a client from config — mesh | groq | grok are interchangeable."""
+    """Build a client from config — mesh """
     key = settings.llm_api_key
     if not key:
         raise RuntimeError(
             f"Missing API key for LLM_PROVIDER={settings.LLM_PROVIDER!r}. "
-            "Set MESH_API_KEY (mesh), GROQ_API_KEY (groq), or XAI_API_KEY (grok)."
+            "Set MESH_API_KEY (mesh),."
         )
     logger.info(
         "LLM client provider=%s base_url=%s model=%s",
