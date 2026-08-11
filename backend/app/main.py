@@ -1,4 +1,6 @@
 from contextlib import asynccontextmanager
+from seed_data import ensure_admin, upsert_resource, SEED_RESOURCES
+from app.database import SessionLocal
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,8 +34,6 @@ async def lifespan(_app: FastAPI):
     Base.metadata.create_all(bind=engine)
     # Additive column for existing Neon DBs (create_all won't alter)
     with engine.begin() as conn:
-        # Only attempt Postgres/Neon-specific ALTERs when the DB dialect
-        # supports them. SQLite will error on `IF NOT EXISTS ... JSONB`.
         try:
             dialect_name = engine.dialect.name
         except Exception:
@@ -52,6 +52,7 @@ async def lifespan(_app: FastAPI):
                     "ADD COLUMN IF NOT EXISTS source_summary JSONB DEFAULT '{}'::jsonb"
                 )
             )
+
     # Warm embedding model + Chroma so first Refresh isn't stuck on HF download
     try:
         from app.vector_store import get_collection, get_embedding_model
@@ -61,8 +62,36 @@ async def lifespan(_app: FastAPI):
         logger.info("[SmartReco] embeddings ready chroma_docs=%s", n)
     except Exception as exc:  # noqa: BLE001 — startup should not die on RAG warm-up
         logger.warning("[SmartReco] embedding warm-up skipped: %s", exc)
-    yield
 
+    # Auto-seed catalog if Chroma's local collection is empty but Postgres
+    # has data (or nothing has data yet) — handles Railway's ephemeral disk
+    # wiping Chroma on every redeploy, while Neon Postgres persists.
+    try:
+        from app.vector_store import get_collection
+        chroma_count = get_collection().count()
+    except Exception:
+        chroma_count = 0
+
+    if chroma_count == 0:
+        logger.info("[SmartReco] Chroma collection empty — running auto-seed")
+        db = SessionLocal()
+        try:
+            ensure_admin(db)
+            synced = 0
+            failed = 0
+            for payload in SEED_RESOURCES:
+                resource = upsert_resource(db, payload)
+                if resource.sync_status == "synced":
+                    synced += 1
+                else:
+                    failed += 1
+            logger.info("[SmartReco] Auto-seed complete: synced=%s failed=%s", synced, failed)
+        finally:
+            db.close()
+    else:
+        logger.info("[SmartReco] Chroma already populated (%s docs) — skipping auto-seed", chroma_count)
+
+    yield
 
 app = FastAPI(title="SmartReco", lifespan=lifespan)
 
